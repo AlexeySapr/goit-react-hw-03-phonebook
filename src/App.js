@@ -4,20 +4,19 @@ import Container from './components/container/Container';
 import Section from './components/section/Section';
 import ContactForm from './components/contactForm/ContactForm';
 import ContactList from './components/contactList/ContactList';
-import initData from './tempData/data.json';
+// import initData from './tempData/data.json';
 import ContactFilter from './components/contactFilter/ContactFilter';
 import Header from './components/header/Header';
 
 class App extends React.Component {
   state = {
-    contacts: initData,
+    contacts: [],
     filter: '',
   };
 
   isInContacts = ({ name, number }) => {
     const normalizedName = name.toLowerCase().replace(/\s+/g, '');
     const normalizedNumber = number.replace(/\D/g, '');
-    console.log(normalizedNumber);
     return this.state.contacts.some(contact => {
       return (
         contact.name.toLowerCase().replace(/\s+/g, '') === normalizedName ||
@@ -56,6 +55,20 @@ class App extends React.Component {
       filter: event.currentTarget.value,
     });
   };
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.contacts !== prevState.contacts) {
+      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
+    }
+  }
+
+  componentDidMount() {
+    const storageContacts = JSON.parse(localStorage.getItem('contacts'));
+
+    if (storageContacts) {
+      this.setState({ contacts: storageContacts });
+    }
+  }
 
   render() {
     const { contacts, filter } = this.state;
